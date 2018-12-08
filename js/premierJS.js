@@ -2,11 +2,13 @@ var canvas = document.getElementById("myCanvas");
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 var context = canvas.getContext("2d");
-const NB_CERCLES = 5;
+const NB_CERCLES = 6;
 const DECALAGE_HORIZON = innerWidth * 0.35;
 const DECALAGE_VERTICAL = innerHeight * 0.35;
 const RAYON = 75;
-
+var courbeX = [];
+var courbeY = [];
+context.lineWidth = 3;
 cercles();
 courbes();
 
@@ -33,6 +35,7 @@ function cercles() {
   requestAnimationFrame(cercles);
   context.clearRect(0, 0, innerWidth, innerHeight);
   draw();
+  context.lineWidth = 2;
   for (var i = 0; i < NB_CERCLES; i++) {
     // Point tournant sur les cercles de la ligne
     var xCentreCercleLigne = DECALAGE_HORIZON + 250 * i;
@@ -45,6 +48,9 @@ function cercles() {
     context.moveTo(xLigne, 0);
     context.lineTo(xLigne, innerHeight);
     context.stroke();
+    for (let j = 0; j < NB_CERCLES; j++) {
+      courbeX.push(xLigne);
+    }
 
     // Point tournant sur les cercles de la colonne
     var yCentreCercleColonne = DECALAGE_VERTICAL + 250 * i - 38;
@@ -57,16 +63,30 @@ function cercles() {
     context.moveTo(0, yColonne);
     context.lineTo(innerWidth, yColonne);
     context.stroke();
+
+    for (let k = 0; k < NB_CERCLES; k++) {
+      yCentreCercleColonne = DECALAGE_VERTICAL + 250 * k - 38;
+      yColonne = yCentreCercleColonne + RAYON * Math.sin(angle * (k + 1));
+
+      courbeY.push(yColonne);
+    }
   }
   angle += 0.01;
-  if (angle > 2 * Math.PI + 0.5) {
-    angle = 0;
-  }
 }
 
 function courbes() {
+  context.lineWidth = 3;
+
   requestAnimationFrame(courbes);
   if (angle > 2 * Math.PI) {
-    alert("bonjour");
+    angle = 0;
+    courbeX = [];
+    courbeY = [];
+  }
+  for (let i = 0; i < courbeX.length; i++) {
+    context.beginPath();
+    context.moveTo(courbeX[i], courbeY[i]);
+    context.lineTo(courbeX[i] + 3, courbeY[i] + 3);
+    context.stroke();
   }
 }
