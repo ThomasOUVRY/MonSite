@@ -4,48 +4,54 @@ canvas.height = innerHeight;
 var context = canvas.getContext("2d");
 const NB_CERCLES = 6;
 const DECALAGE_HORIZON = innerWidth * 0.35;
-const DECALAGE_VERTICAL = innerHeight * 0.35;
-const RAYON = 75;
+const DECALAGE_VERTICAL = innerHeight * 0.25;
+const RAYON = innerHeight / 22;
+console.log(RAYON);
+const ESPACEMENT = RAYON * 3;
 var courbeX = [];
 var courbeY = [];
 context.lineWidth = 3;
+context.fillStyle = "white";
 cercles();
 courbes();
 
 function draw() {
   context.strokeStyle = "white";
-  let yHorizon = 150;
-  let xVertical = DECALAGE_HORIZON - 250;
+  let yHorizon = RAYON * 2;
+  let xVertical = DECALAGE_HORIZON - ESPACEMENT;
   for (var i = 0; i < NB_CERCLES; i++) {
     // Cercles 1ère ligne
-    var x = DECALAGE_HORIZON + 250 * i;
+    var x = DECALAGE_HORIZON + ESPACEMENT * i;
     context.beginPath();
     context.arc(x, yHorizon, RAYON, 0, 2 * Math.PI);
+    context.lineWidth = 3;
     context.stroke();
     // Cercle 1ère colonne
-    var y = DECALAGE_VERTICAL + 250 * i - 40;
+    var y = DECALAGE_VERTICAL + ESPACEMENT * i;
     context.beginPath();
     context.arc(xVertical, y, RAYON, 0, 2 * Math.PI);
+    context.lineWidth = 3;
     context.stroke();
   }
 }
 
 var angle = 0;
 function cercles() {
-  requestAnimationFrame(cercles);
+  const RAYON_TOURNANTS = RAYON / 7;
   context.clearRect(0, 0, innerWidth, innerHeight);
   draw();
-  context.lineWidth = 2;
   for (var i = 0; i < NB_CERCLES; i++) {
     // Point tournant sur les cercles de la ligne
-    var xCentreCercleLigne = DECALAGE_HORIZON + 250 * i;
+    var xCentreCercleLigne = DECALAGE_HORIZON + ESPACEMENT * i;
     var xLigne = xCentreCercleLigne + RAYON * Math.cos(angle * (i + 1));
-    var yLigne = RAYON * Math.sin(angle * (i + 1)) + 150;
+    var yLigne = RAYON * Math.sin(angle * (i + 1)) + RAYON * 2;
     context.beginPath();
-    context.arc(xLigne, yLigne, 5, 0, Math.PI * 2);
+    context.arc(xLigne, yLigne, RAYON_TOURNANTS, 0, Math.PI * 2);
+    context.lineWidth = 1;
     context.stroke();
     // Lignes bougeant par rapport aux cercles tournant sur la ligne
     context.moveTo(xLigne, 0);
+    context.lineWidth = 1;
     context.lineTo(xLigne, innerHeight);
     context.stroke();
     for (let j = 0; j < NB_CERCLES; j++) {
@@ -53,40 +59,41 @@ function cercles() {
     }
 
     // Point tournant sur les cercles de la colonne
-    var yCentreCercleColonne = DECALAGE_VERTICAL + 250 * i - 38;
-    var xColonne = DECALAGE_HORIZON - 250 + RAYON * Math.cos(angle * (i + 1));
+    var yCentreCercleColonne = DECALAGE_VERTICAL + ESPACEMENT * i;
+    var xColonne =
+      DECALAGE_HORIZON - ESPACEMENT + RAYON * Math.cos(angle * (i + 1));
     var yColonne = yCentreCercleColonne + RAYON * Math.sin(angle * (i + 1));
     context.beginPath();
-    context.arc(xColonne, yColonne, 5, 0, Math.PI * 2);
+    context.arc(xColonne, yColonne, RAYON_TOURNANTS, 0, Math.PI * 2);
     context.stroke();
     // Lignes bougeant par rapport aux cercles tournant sur la ligne
     context.moveTo(0, yColonne);
+    context.lineWidth = 1;
     context.lineTo(innerWidth, yColonne);
     context.stroke();
 
     for (let k = 0; k < NB_CERCLES; k++) {
-      yCentreCercleColonne = DECALAGE_VERTICAL + 250 * k - 38;
+      yCentreCercleColonne = DECALAGE_VERTICAL + ESPACEMENT * k;
       yColonne = yCentreCercleColonne + RAYON * Math.sin(angle * (k + 1));
-
       courbeY.push(yColonne);
     }
   }
+
   angle += 0.01;
+  requestAnimationFrame(cercles);
 }
 
 function courbes() {
-  context.lineWidth = 3;
-
-  requestAnimationFrame(courbes);
   if (angle > 2 * Math.PI) {
     angle = 0;
+    console.log(courbeX.length);
+    console.log(courbeY.length);
+
     courbeX = [];
     courbeY = [];
   }
   for (let i = 0; i < courbeX.length; i++) {
-    context.beginPath();
-    context.moveTo(courbeX[i], courbeY[i]);
-    context.lineTo(courbeX[i] + 3, courbeY[i] + 3);
-    context.stroke();
+    context.fillRect(courbeX[i], courbeY[i], 3, 3);
   }
+  requestAnimationFrame(courbes);
 }
